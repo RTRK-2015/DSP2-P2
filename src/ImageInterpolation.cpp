@@ -35,16 +35,16 @@ void sampleAndHold(const uchar input[], int xSize, int ySize, uchar output[], in
 		}
 	}
 
-	for (int i = 0; i < newYSize / 4; ++i)
+	for (int i = 0; i < newYSize / 2; ++i)
 	{
-		for (int j = 0; j < newXSize; ++j)
+		for (int j = 0; j < newXSize / 2; ++j)
 		{
 			const int
 				iprime = (i - 1) / Sv + 1,
 				jprime = (j - 1) / Sh + 1;
 
-			vnew[i * newXSize + j] = vold[iprime * xSize + jprime];
-			unew[i * newXSize + j] = uold[iprime * xSize + jprime];
+			vnew[i * newXSize / 2 + j] = vold[iprime * xSize / 2  + jprime];
+			unew[i * newXSize / 2 + j] = uold[iprime * xSize / 2 + jprime];
 		}
 	}
 
@@ -82,8 +82,8 @@ void bilinearInterpolate(const uchar input[], int xSize, int ySize, uchar output
 		for (int j = 0; j < newXSize; ++j)
 		{
 			const double
-				b = j / Sh - floor(j / Sh),
-				a = i / Sv - floor(i / Sv);
+				a = i / Sv - floor(i / Sv),
+				b = j / Sh - floor(j / Sh);
 
 			const int
 				iprime = i / Sv,
@@ -97,29 +97,29 @@ void bilinearInterpolate(const uchar input[], int xSize, int ySize, uchar output
 		}
 	}
 
-	for (int i = 0; i < newYSize / 4; ++i)
+	for (int i = 0; i < newYSize / 2; ++i)
 	{
-		for (int j = 0; j < newXSize; ++j)
+		for (int j = 0; j < newXSize / 2; ++j)
 		{
 			const double
-				a = j / Sh - floor(j / Sh),
-				b = i / Sv - floor(i / Sv);
+				a = i / Sv - floor(i / Sv),
+				b = j / Sh - floor(j / Sh);
 
 			const int
 				iprime = i / Sv,
 				jprime = j / Sh;
 
-			unew[i * newXSize + j] =
-				(1 - a) * (1 - b) * uold[iprime * xSize + jprime] +
-				(1 - a) * b * uold[(iprime + 1) * xSize + jprime] +
-				a * (1 - b) * uold[iprime * xSize + (jprime + 1)] +
-				a * b * uold[(iprime + 1) * xSize + (jprime + 1)];
+			unew[i * newXSize / 2 + j] =
+				(1 - a) * (1 - b) * uold[iprime * xSize / 2 + jprime] +
+				(1 - a) * b * uold[(iprime + 1) * xSize / 2 + jprime] +
+				a * (1 - b) * uold[iprime * xSize / 2 + (jprime + 1)] +
+				a * b * uold[(iprime + 1) * xSize / 2 + (jprime + 1)];
 
-			vnew[i * newXSize + j] =
-				(1 - a) * (1 - b) * vold[iprime * xSize + jprime] +
-				(1 - a) * b * vold[(iprime + 1) * xSize + jprime] +
-				a * (1 - b) * vold[iprime * xSize + (jprime + 1)] +
-				a * b * vold[(iprime + 1) * xSize + (jprime + 1)];
+			vnew[i * newXSize / 2 + j] =
+				(1 - a) * (1 - b) * vold[iprime * xSize / 2 + jprime] +
+				(1 - a) * b * vold[(iprime + 1) * xSize / 2 + jprime] +
+				a * (1 - b) * vold[iprime * xSize / 2 + (jprime + 1)] +
+				a * b * vold[(iprime + 1) * xSize / 2 + (jprime + 1)];
 		}
 	}
 
@@ -157,8 +157,8 @@ void imageRotate(const uchar input[], int xSize, int ySize, uchar output[], int 
 		for (int x = 0; x < xSize; ++x)
 		{
 			const int
-				xprime = x * cos(θ) - y * sin(θ) - m * cos(θ) + n * sin(θ) + m,
-				yprime = y * cos(θ) + x * sin(θ) - m * sin(θ) - n * cos(θ) + n;
+				xprime = round(x * cos(θ) - y * sin(θ) - m * cos(θ) + n * sin(θ) + m),
+				yprime = round(y * cos(θ) + x * sin(θ) - m * sin(θ) - n * cos(θ) + n);
 
 			if (xprime >= xSize || xprime < 0 || yprime >= ySize || yprime < 0)
 				ynew[y * xSize + x] = 0;
@@ -168,27 +168,26 @@ void imageRotate(const uchar input[], int xSize, int ySize, uchar output[], int 
 	}
 
 
-	/* No idea
-	for (int y = 0; y < ySize / 4; ++y)
+	for (int y = 0; y < ySize / 2; ++y)
 	{
-		for (int x = 0; x < xSize; ++x)
+		for (int x = 0; x < xSize / 2; ++x)
 		{
 			const int
-				xprime = x * cos(θ) - y * sin(θ) - m * cos(θ) + n * sin(θ) + m,
-				yprime = y * cos(θ) + x * sin(θ) - m * sin(θ) - n * cos(θ) + n;
-
-			if (xprime >= xSize || xprime < 0 || yprime >= ySize / 4 || yprime < 0)
+				xprime = round(x  * cos(θ) - y  * sin(θ) - m / 2 * cos(θ) + n / 2 * sin(θ) + m / 2),
+				yprime = round(y  * cos(θ) + x  * sin(θ) - m / 2 * sin(θ) - n / 2 * cos(θ) + n / 2);
+			
+			if (xprime >= xSize / 2 || xprime < 0 || yprime >= ySize / 2 || yprime < 0)
 			{
-				unew[y * xSize + x] = 0;
-				vnew[y * xSize + x] = 0;
+				unew[y * xSize / 2 + x ] = 0;
+				vnew[y * xSize / 2 + x ] = 0;
 			}
 			else
 			{
-				unew[y * xSize + x] = uold[yprime * xSize + xprime];
-				vnew[y * xSize + x] = vold[yprime * xSize + xprime];
+				unew[y * xSize / 2 + x] = uold[yprime * xSize / 2 + xprime];
+				vnew[y * xSize / 2 + x] = vold[yprime * xSize / 2 + xprime];
 			}
 		}
-	}*/
+	}
 
 
 	YUV420toRGB(ynew, unew, vnew, xSize, ySize, output);
@@ -255,19 +254,18 @@ void imageRotateBilinear(const uchar input[], int xSize, int ySize, uchar output
 	}
 
 
-	/* Still no idea
-	for (int y = 0; y < ySize / 4; ++y)
+	for (int y = 0; y < ySize / 2; ++y)
 	{
-		for (int x = 0; x < xSize; ++x)
+		for (int x = 0; x < xSize / 2; ++x)
 		{
 			const double
-				xprime = x * cos(θ) - y * sin(θ) - m * cos(θ) + n * sin(θ) + m,
-				yprime = y * cos(θ) + x * sin(θ) - m * sin(θ) - n * cos(θ) + n;
+				xprime = x * cos(θ) - y * sin(θ) - m / 2 * cos(θ) + n / 2 * sin(θ) + m / 2,
+				yprime = y * cos(θ) + x * sin(θ) - m / 2 * sin(θ) - n / 2 * cos(θ) + n / 2;
 
-			if (xprime >= xSize || xprime < 0 || yprime >= ySize / 4 || yprime < 0)
+			if (xprime >= xSize / 2 || xprime < 0 || yprime >= ySize / 2 || yprime < 0)
 			{
-				unew[y * xSize + x] = 0;
-				vnew[y * xSize + x] = 0;
+				unew[y * xSize / 2 + x] = 0;
+				vnew[y * xSize / 2 + x] = 0;
 			}
 			else if (xprime != floor(xprime) || yprime != floor(yprime))
 			{
@@ -279,25 +277,25 @@ void imageRotateBilinear(const uchar input[], int xSize, int ySize, uchar output
 					a = yprime - ybase,
 					b = xprime - xbase;
 
-				unew[y * xSize + x] =
-					(1 - a) * (1 - b) * uold[ybase * xSize + xbase] +
-					(1 - a) * b * uold[(ybase + 1) * xSize + xbase] +
-					a * (1 - b) * uold[ybase * xSize + (xbase + 1)] +
-					a * b * uold[(ybase + 1) * xSize + (xbase + 1)];
+				unew[y * xSize / 2 + x] =
+					(1 - a) * (1 - b) * uold[ybase * xSize / 2 + xbase] +
+					(1 - a) * b * uold[(ybase + 1) * xSize / 2 + xbase] +
+					a * (1 - b) * uold[ybase * xSize / 2 + (xbase + 1)] +
+					a * b * uold[(ybase + 1) * xSize / 2 + (xbase + 1)];
 
-				vnew[y * xSize + x] =
-					(1 - a) * (1 - b) * vold[ybase * xSize + xbase] +
-					(1 - a) * b * vold[(ybase + 1) * xSize + xbase] +
-					a * (1 - a) * vold[ybase * xSize + (xbase + 1)] +
-					a * b * vold[(ybase + 1) * xSize + (xbase + 1)];
+				vnew[y * xSize / 2 + x] =
+					(1 - a) * (1 - b) * vold[ybase * xSize / 2 + xbase] +
+					(1 - a) * b * vold[(ybase + 1) * xSize / 2 + xbase] +
+					a * (1 - a) * vold[ybase * xSize / 2 + (xbase + 1)] +
+					a * b * vold[(ybase + 1) * xSize / 2 + (xbase + 1)];
 			}
 			else
 			{
-				unew[y * xSize + x] = uold[(int)(yprime * xSize + xprime)];
-				vnew[y * xSize + x] = vold[(int)(yprime * xSize + xprime)];
+				unew[y * xSize / 2 + x] = uold[(int)(yprime * xSize / 2 + xprime)];
+				vnew[y * xSize / 2 + x] = vold[(int)(yprime * xSize / 2 + xprime)];
 			}
 		}
-	}*/
+	}
 
 
 	YUV420toRGB(ynew, unew, vnew, xSize, ySize, output);

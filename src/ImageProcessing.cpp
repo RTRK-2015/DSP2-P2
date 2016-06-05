@@ -13,7 +13,7 @@ void imageProcessingFun(const QString& progName, QImage* const outImgs, const QI
 
   auto upto = [](int x, int y)
   {
-	return (x % y == 0) ? x : (x + y) & ~(y - 1);
+	return (x + y - 1) & ~(y - 1);
   };
 
 
