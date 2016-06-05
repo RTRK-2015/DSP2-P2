@@ -42,7 +42,7 @@
     <IncludePath>C:\Users\Alex\AppData\Local\Qt\5.7\msvc2015\include\;C:\Users\Alex\AppData\Local\Qt\5.7\msvc2015\include\QtCore;C:\Users\Alex\AppData\Local\Qt\5.7\msvc2015\include\QtGui;C:\Users\Alex\AppData\Local\Qt\5.7\msvc2015\include\QtWidgets;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Users\Alex\AppData\Local\Qt\5.7\msvc2015\include;C:\Users\Alex\AppData\Local\Qt\5.7\msvc2015\include\QtCore;C:\Users\Alex\AppData\Local\Qt\5.7\msvc2015\include\QtGui;C:\Users\Alex\AppData\Local\Qt\5.7\msvc2015\include\QtWidgets;$(IncludePath)</IncludePath>
+    <IncludePath>$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtWidgets;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
